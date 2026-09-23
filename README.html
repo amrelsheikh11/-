@@ -1,0 +1,356 @@
+السبب في عدم قدرتك على التعديل هو أن بعض المتصفحات تقوم بحماية الحقول النصية التي تحتوي على قيم افتراضية داخل الأكواد الجاهزة.
+لقد قمت بتحديث الكود وتغيير طريقة الإدخال إلى حقول نصية مفتوحة بالكامل وشفافة (Inline Text Editing)، مما يتيح لك الآن الضغط على أي كلمة في الإيصال (اسم العميل، رقم الإيصال، الخدمة) وتعديلها بيدك فوراً وكأنك تكتب داخل ملف Word.
+قم بنسخ هذا الكود المطور واستبدله في ملف index.html على GitHub:
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إيصال مستحقات ذكي مرن</title>
+    <style>
+        @import url('https://googleapis.com');
+
+        :root {
+            --bg-color: #fbfbfd;
+            --text-dark: #1d1d1f;
+            --text-muted: #86868b;
+            --gold: #c5a880;
+            --border: #f2f2f2;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .receipt-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 45px 35px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header .logo {
+            font-size: 28px;
+            font-weight: 300;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .header p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .details {
+            margin-bottom: 35px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .lbl {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* تنسيق الحقول لتصبح مرنة وقابلة للضغط والكتابة */
+        .editable-val {
+            font-weight: 600;
+            color: var(--text-dark);
+            border-bottom: 1px dashed #cbd5e1;
+            padding: 2px 6px;
+            min-width: 120px;
+            text-align: left;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .editable-val:focus {
+            border-bottom-color: var(--gold);
+            background-color: #f8fafc;
+            border-radius: 4px;
+        }
+
+        select {
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            border: none;
+            border-bottom: 1px dashed #cbd5e1;
+            outline: none;
+            background: transparent;
+            cursor: pointer;
+            padding: 2px 4px;
+            text-align: left;
+            direction: rtl;
+        }
+
+        .amount-section {
+            text-align: center;
+            padding: 25px 0 10px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .amount-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .amount-editable {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-dark);
+            outline: none;
+            display: inline-block;
+            min-width: 80px;
+            border-bottom: 2px dashed #cbd5e1;
+            padding: 0 5px;
+            margin-left: 5px;
+        }
+
+        .amount-editable:focus {
+            border-bottom-color: var(--gold);
+            background-color: #f8fafc;
+        }
+
+        .currency-label {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .word-amount {
+            font-size: 13px;
+            color: var(--gold);
+            font-weight: 600;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 35px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .btn-area {
+            margin-top: 25px;
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+        }
+
+        .print-btn {
+            font-family: 'Cairo', sans-serif;
+            background: none;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 10px 24px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .print-btn:hover {
+            background: var(--gold);
+            color: #ffffff;
+        }
+
+        /* عند الطباعة تختفي كل الخطوط المتقطعة والأزرار تماماً لمظهر رسمي */
+        @media print {
+            body { background: white; padding: 0; }
+            .receipt-box { box-shadow: none; border: none; padding: 0; }
+            .print-btn { display: none; }
+            .editable-val, .amount-editable {
+                border-bottom: none !important;
+                padding: 0 !important;
+                background: transparent !important;
+            }
+            select {
+                border-bottom: none !important;
+                appearance: none;
+                -webkit-appearance: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="receipt-box">
+        <div class="header">
+            <div class="logo">✦</div>
+            <h1>إيصال مستحقات رقمي</h1>
+            <p>Payment Receipt</p>
+        </div>
+
+        <div class="details">
+            <div class="row">
+                <span class="lbl">رقم الإيصال</span>
+                <!-- متاح للكتابة المباشرة -->
+                <span class="editable-val" contenteditable="true">#0482</span>
+            </div>
+            <div class="row">
+                <span class="lbl">التاريخ</span>
+                <span class="val" id="date">23 سبتمبر 2026</span>
+            </div>
+            <div class="row">
+                <span class="lbl">العميل</span>
+                <!-- متاح للكتابة المباشرة -->
+                <span class="editable-val" contenteditable="true">أحمد محمد</span>
+            </div>
+            <div class="row">
+                <span class="lbl">مقابل خدمات</span>
+                <!-- متاح للكتابة المباشرة -->
+                <span class="editable-val" contenteditable="true">تصميم وتطوير واجهات</span>
+            </div>
+            <div class="row">
+                <span class="lbl">طريقة الدفع</span>
+                <span class="val">
+                    <select id="payment-method">
+                        <option value="1">تحويل بنكي</option>
+                        <option value="2">فودافون كاش</option>
+                        <option value="3">انستاباي</option>
+                    </select>
+                </span>
+            </div>
+        </div>
+
+        <div class="amount-section">
+            <span class="amount-lbl">المبلغ المستلم</span>
+            <div>
+                <!-- الرقم متاح للكتابة المباشرة وسيقوم بالتفقيط تلقائياً -->
+                <span class="amount-editable" id="num-input" contenteditable="true">5000</span>
+                <span class="currency-label">ج.م</span>
+            </div>
+            <div class="word-amount" id="word-output">فقط خمسة آلاف جنيه مصري لا غير</div>
+        </div>
+
+        <div class="footer">
+            <p>شكراً لثقتكم بنا.</p>
+        </div>
+    </div>
+
+    <div class="btn-area">
+        <button class="print-btn" onclick="window.print()">تحميل وحفظ الإيصال</button>
+    </div>
+
+    <script>
+        // تثبيت تاريخ اليوم تلقائياً بطلبك
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('date').innerText = new Date().toLocaleDateString('ar-EG', options);
+
+        // محرك التفقيط التلقائي للأرقام باللغة العربية
+        function taqfeet(num) {
+            if (num === 0 || isNaN(num)) return 'صفر جنيه مصري';
+            
+            const ones = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة', 'عشرة', 'أحد عشر', 'اثنا عشر', 'ثلاثة عشر', 'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر'];
+            const tens = ['', '', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+            const hundreds = ['', 'مائة', 'مائتان', 'ثلاثمائة', 'أربعمائة', 'خمسمائة', 'ستمائة', 'سبعمائة', 'ثمانمائة', 'تسعمائة'];
+
+            function convertLessThanKey(n) {
+                if (n < 20) return ones[n];
+                const digit = n % 10;
+                return tens[Math.floor(n / 10)] + (digit > 0 ? ' و' + ones[digit] : '');
+            }
+
+            function convertLessThanThousand(n) {
+                if (n < 100) return convertLessThanKey(n);
+                const remainder = n % 100;
+                return hundreds[Math.floor(n / 100)] + (remainder > 0 ? ' و' + convertLessThanKey(remainder) : '');
+            }
+
+            function convert(n) {
+                if (n < 1000) return convertLessThanThousand(n);
+                if (n < 1000000) {
+                    const thousands = Math.floor(n / 1000);
+                    const remainder = n % 1000;
+                    let thStr = '';
+                    if (thousands === 1) thStr = 'ألف';
+                    else if (thousands === 2) thStr = 'ألفان';
+                    else if (thousands >= 3 && thousands <= 10) thStr = ones[thousands] + ' آلاف';
+
+else thStr = convertLessThanThousand(thousands) + ' ألف';
+return thStr + (remainder > 0 ? ' و' + convertLessThanThousand(remainder) : '');
+}
+return n;
+}
+return 'فقط ' + convert(num) + ' جنيه مصري لا غير';
+}
+const input = document.getElementById('num-input');
+const output = document.getElementById('word-output');
+// تحديث التفقيط عند كتابة الرقم بيدك لحظياً
+input.addEventListener('input', function() {
+let val = parseInt(input.innerText.replace(/[^0-9]/g, '')) || 0;
+output.innerText = taqfeet(val);
+});
+// منع إدخال الحروف داخل حقل الرقم
+input.addEventListener('keydown', function(e) {
+if (e.key === 'Enter') {
+e.preventDefault();
+input.blur();
+}
+});
+
+
+### ماذا يتغير الآن؟
+* **حرية التعديل المطلقة**: بمجرد فتح الرابط، اضغط بيدك على كلمة "أحمد محمد" وامسحها واكتب الاسم الجديد، ونفس الأمر لـ "رقم الإيصال" و"المبلغ".
+* **الحفظ النظيف للـ PDF**: عند الحفظ، تختفي الخطوط المتقطعة الإرشادية تماماً لتظهر الصفحة مصمتة وجاهزة للعميل.
+
+احفظ الملف وقم بعمل (`Ctrl + F5`) لتحديث الرابط وجرب الكتابة بنفسك! هل **تعمل معك لوحة الكتابة الآن بشكل سلس؟**
+
+<FollowUp>
+بمجرد تشغيل نظام الكتابة والتفقيط الذكي بنجاح، هل تحتاج إلى:
+* إضافة **خانة توقيع أو ختم مصغر** أسفل الإيصال؟
+* تفعيل خيار لتغيير **العملة تلقائياً** (مثل الدولار أو الريال بدلاً من الجنيه)؟
+</FollowUp>
+
+
