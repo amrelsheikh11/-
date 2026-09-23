@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إيصال مستحقات عميل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .receipt-card {
+            width: 550px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #e1e8ed;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: #f1a80a;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #e2e8f0;
+        }
+
+        .title-badge {
+            background-color: #0d1b2a;
+            color: #ffffff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        .date-text {
+            color: #1e293b;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .company-name {
+            text-align: left;
+        }
+
+        .company-name h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0d1b2a;
+            line-height: 1.1;
+        }
+
+        .company-name p {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .logo-box {
+            background-color: #0d1b2a;
+            color: #ffffff;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-box .ht {
+            font-weight: 900;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .logo-box .sub {
+            font-size: 8px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .field-row {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .field-label {
+            background-color: #edf2f7;
+            color: #334155;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 140px;
+        }
+
+        .field-value {
+            flex: 1;
+            text-align: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: #0f172a;
+        }
+
+        select.field-value {
+            border: none;
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+            text-align-last: center;
+        }
+
+        .amount-box {
+            background-color: #ffffff;
+            border: 2px solid #f1a80a;
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .amount-title {
+            color: #0d1b2a;
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .amount-number {
+            font-size: 38px;
+            font-weight: 800;
+            color: #0d1b2a;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .amount-words {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 6px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 8px;
+        }
+
+        .footer-signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding: 0 10px;
+        }
+
+        .sig-block {
+            text-align: center;
+        }
+
+        .sig-title {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .sig-name {
+            font-weight: 800;
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+        .sig-line {
+            margin-top: 15px;
+            border-bottom: 2px dashed #cbd5e1;
+            width: 130px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sig-subtext {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .bottom-note {
+            margin-top: 20px;
+            padding-top: 12px;
+            border-top: 2px dashed #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="receipt-card">
+        <div class="top-bar"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <div class="title-badge">مستحقات عميل</div>
+                <div class="date-text">التاريخ: 23/09/2026</div>
+            </div>
+            <div class="logo-section">
+                <div class="company-name">
+                    <h2>إيطاليانو</h2>
+                    <p>ملابس جاهزة</p>
+                </div>
+                <div class="logo-box">
+                    <span class="ht">HT</span>
+                    <span class="sub">FASHION</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Name -->
+        <div class="field-row">
+            <div class="field-label">
+                <span>👤</span> اسم العميل /
+            </div>
+            <div class="field-value">عمر العدلي</div>
+        </div>
+
+        <!-- Amount Box -->
+        <div class="amount-box">
+            <div class="amount-title">المبلغ المستحق</div>
+            <div class="amount-number">157,000</div>
+            <div class="amount-words">مائة وسبعة وخمسون ألف جنيهاً فقط لا غير</div>
+        </div>
+
+        <!-- Account / Transaction Source Dropdown -->
+        <div class="field-row">
+            <div class="field-label">
+                <span>🔒</span> من حـ/
+            </div>
+            <select class="field-value">
+                <option value="باقي عربون" selected>باقى عربون</option>
+                <option value="تحويل بنكي">تحويل بنكى</option>
+                <option value="مرتجع بيع">مرتجع بيع</option>
+                <option value="إنستا باي">انستا باى</option>
+                <option value="فودافون كاش">ڤودافون كاش</option>
+            </select>
+        </div>
+
+        <!-- Signatures -->
+        <div class="footer-signatures">
+            <div class="sig-block">
+                <div class="sig-title">يعتمد،،،</div>
+                <div class="sig-name">أ/ عمرو الشيخ</div>
+            </div>
+            <div class="sig-block">
+                <div class="sig-title">توقيع المستلم / العميل</div>
+                <div class="sig-line"></div>
+                <div class="sig-subtext">التوقيع بالاستلام</div>
+            </div>
+        </div>
+
+        <!-- Bottom Ref Footer -->
+        <div class="bottom-note">
+            <span>REF-20260923-820</span>
+            <span>سند رسمي لمستحقات العميل من إدارة شركة إيطاليانو للملابس الجاهزة</span>
+        </div>
+    </div>
+
+</body>
+</html>
